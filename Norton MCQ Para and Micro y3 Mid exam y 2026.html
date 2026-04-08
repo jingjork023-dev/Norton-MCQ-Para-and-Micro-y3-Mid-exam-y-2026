@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Norton University - Micro/Para PCEM3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap');
+        body { font-family: 'ui-sans-serif', system-ui, sans-serif; background-color: #f1f5f9; }
+        
+        .option-correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            animation: pulse-green 0.4s ease-out;
+        }
+        .option-incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        .disabled-labels { pointer-events: none; opacity: 0.8; }
+        .redo-btn {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #3b82f6;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .redo-btn:hover { background-color: #3b82f6; color: white; }
+        .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); }
+        .khmer-header { font-family: 'Kantumruy Pro', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 py-10 px-4">
+
+    <div class="max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+        <!-- Header -->
+        <div class="bg-slate-900 p-8 text-white text-center">
+            <h1 class="text-4xl font-black mb-2">NORTON UNIVERSITY</h1>
+            <p class="text-xl khmer-header opacity-80">Faculty of Medicine and Pharmacy Year 3</p>
+            <p class="text-lg opacity-70">Microbiology and Parasitology - QCM proposed for exam</p>
+        </div>
+
+        <!-- Sticky Nav -->
+        <div class="sticky-nav text-white p-3 overflow-x-auto whitespace-nowrap flex gap-4 text-[10px] font-bold uppercase tracking-widest scrollbar-hide border-b border-indigo-700">
+            <script>
+                const sectionsNames = ["Ascariasis", "Ancylostomiasis", "Strongyloïdiasis", "Trichocephaliasis", "Trichinellosis", "Schistosomiasis", "Clonorchiasis", "Fasciola", "Fasciolopsis", "Diphyllobothrium", "Taeniasis", "Hymenolepis", "Echinococcus", "Giardiasis", "Trichomoniasis", "Amebiasis", "Balantidiasis"];
+                sectionsNames.forEach((name, i) => {
+                    document.write(`<a href="#sec-${i+1}" class="hover:text-blue-400 px-2 border-r border-slate-700 last:border-0">${name}</a>`);
+                });
+            </script>
+        </div>
+
+        <div class="p-6 md:p-10">
+            <div id="quiz-container" class="space-y-20">
+                <!-- Sections Injected by JavaScript -->
+            </div>
+
+            <!-- Final Result Box -->
+            <div id="final-result" class="hidden mt-20 p-10 bg-slate-900 text-white rounded-3xl text-center shadow-2xl">
+                <h2 class="text-3xl font-bold mb-4">Exam Completion</h2>
+                <div class="text-7xl font-extrabold mb-4 text-emerald-400"><span id="total-score">0</span> / <span id="max-score">235</span></div>
+                <button onclick="location.reload()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition">
+                    Restart Quiz
+                </button>
+            </div>
+
+            <div class="mt-12 flex justify-center">
+                <button onclick="calculateFinalScore()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 px-16 rounded-full shadow-2xl transform transition active:scale-95 text-xl">
+                    Finalize & Calculate Total Score
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Full 235 Questions Data
+        const quizData = [
+            { id: 1, title: "1)- Ascariasis", questions: [
+                { n: 1, q: "The increasing prevalence of ascariasis are in :", o: ["Rainy season", "Under developed countries", "Tropical and subtropical countries", "A+B", "A+B+C"], a: 4 },
+                { n: 2, q: "Hote definitif of ascariasis include:", o: ["Human", "Animal", "Fish", "Water", "Others"], a: 0 },
+                { n: 3, q: "Morphology of fertilized egg of ascariasis include:", o: ["Measure between 85-95X43-47mm", "Thin shelled", "Mammillated", "Elongated and larger than fertilized egg", "Others"], a: 2 },
+                { n: 4, q: "Morphology of fertilized egg of ascariasis include:", o: ["Elongated and smaller than fertilized egg", "Measure between 85-95X43-47mm", "Thin shelled", "B+C", "A+B+C"], a: 3 },
+                { n: 5, q: "Characteristics the eggs of ascariasis include:", o: ["Eggs cannot embryonate in solutions of formalin, H2So4 and HCL.", "Eggs are resistant to usual methods of chemical water purification, removed by Filtration and killed by boiling.", "Eggs embryonate but do not hatch until ingested by man", "A+B", "B+C"], a: 4 },
+                { n: 6, q: "Morphology adult worm of ascariasis include:", o: ["3 large rounded lip.", "Length 15-35cm", "Female is smaller than male.", "A+B", "A+B+C"], a: 3 },
+                { n: 7, q: "Causes of ascariasis include:", o: ["Human feces are used for fertilizer", "Unwashed fruits or vegetables", "From person to person", "Contact with soil mixed with human feces that contain ascariasis eggs or infected water", "A+B+C+D"], a: 4 },
+                { n: 8, q: "Risk factors of ascariasis include:", o: ["Use of human feces for fertilizer", "Living in or visiting a warm climate", "Lack of sanitation infrastructure", "A+B", "A+B+C"], a: 4 },
+                { n: 9, q: "Mode of transmission of ascariasis by:", o: ["Intermediate host ( Animal)", "Definitive host ( Human and Pig)", "Ingestion of water or food contaminated with A. lumbricoides eggs.", "A+B", "B+C"], a: 4 },
+                { n: 10, q: "Incubation period of ascariasis include:", o: ["Average: 2 days", "Average:2 weeks", "Average:2 months", "Average:2 years", "Others"], a: 2 },
+                { n: 11, q: "Symptoms of ascariasis include:", o: ["Fever", "Breathing difficulty", "Urticaria", "A+B", "A+B+C"], a: 4 },
+                { n: 12, q: "Symptoms of ascariasis with adult parasite in the intestine include:", o: ["Heavy worms load can’t affect retard physical and mental development", "Abdominal discomfort ( Nausea)", "Asymptomatic (85%)", "A+B", "B+C"], a: 4 },
+                { n: 13, q: "Symptoms of ascariasis with worm migration include:", o: ["Peritonitis ,Appendicitis", "Severe inflammatory reaction", "Dermatological and allergic reactions can’t occur.", "A+B", "A+B+C"], a: 3 },
+                { n: 14, q: "Laboratory diagnosis of ascariasis by:", o: ["Stool microscopy", "Microscopic identification", "Eosinophilia", "A+B", "A+B+C"], a: 4 },
+                { n: 15, q: "Differential diagnosis of ascariasis include:", o: ["Salmonella infection", "Appendicitis", "Acute Cholangitis", "Small-Bowel Obstruction", "A+B+C+D"], a: 4 },
+                { n: 16, q: "Treatment of ascariasis include:", o: ["Pyrantel pamoate", "Ampicilline", "Rifampicine", "Cephalosporine", "A+B+C+D"], a: 0 },
+                { n: 17, q: "Complications of ascariasis include:", o: ["Pancreatitis", "Digestive perforation", "liver abscess", "Lung cancer", "A+B+C+D"], a: 0 },
+                { n: 18, q: "Prevention of ascariasis include:", o: ["Wash hands with soap and water before handling food", "Good hygiene", "Dispose of diapers properly.", "A+B", "A+B+C"], a: 4 }
+            ]},
+            { id: 2, title: "2)- Ancylostomiasis", questions: [
+                { n: 19, q: "Geographic distribution of ancylostomiasis include:", o: ["Worldwide", "Mostly in areas with moist", "Temperate climate", "A+B", "A+B+C"], a: 3 },
+                { n: 20, q: "In the world people ancylostomiasis infected are estimated that:", o: ["Less than 1300 million people", "More than 1300 million people", "Less than 130 million people", "More than 130 million people", "Others"], a: 1 },
+                { n: 21, q: "Morphology adult worms of ankylostoma hookworms include:", o: ["Female worms measure about 10 to 13 mm x 0.6 mm", "Males Worms measure about 8 to 10 mm x 0.5 mm", "The worms attach to the intestinal of the jejunum and duodenum by their mouth parts.", "A+B", "A+B+C"], a: 4 },
+                { n: 22, q: "Morphology eggs of ankylostoma hookworms include:", o: ["Measure about 6 µm x 4 µm", "Are oval and colorless", "Are spherical and discolors", "Measure about 60 µm x 40 µm", "B+D"], a: 4 },
+                { n: 23, q: "Host definitive of ankylostoma hookworms include:", o: ["Human", "Animal", "Bird", "A+B", "A+B+C"], a: 0 },
+                { n: 24, q: "Life cycle of ancylostomiasis include:", o: ["Eggs are passed in the stool, and under favorable conditions", "Adult worms live in the lumen of the small intestine,", "These larvae take seven to ten days to become infective (filariform larvae)", "A+B", "A+B+C"], a: 4 },
+                { n: 25, q: "Causes of ancylostomiasis include:", o: ["Persons walking barefoot over contaminated soil.", "Good sanitation", "Human feces are not used for fertilizer", "Persons walking boot over non contaminated soil", "Others"], a: 0 },
+                { n: 26, q: "Risk factors of ancylostomiasis include:", o: ["Inadequate sanitation", "Optimal conditions for eggs", "Low socioeconomic status and low education", "Poor waste management systems", "A+B+C+D"], a: 4 },
+                { n: 27, q: "Transmission of ancylostomiasis include:", o: ["From person to person", "Through penetration of the skin whereas", "Percutaneously", "A+B", "B+C"], a: 4 },
+                { n: 28, q: "Incubation period of ancylostomiasis include:", o: ["Between a few weeks to many months", "Between a few days to many weeks", "Dependent on the number of hookworm parasites", "A+B", "A+C"], a: 4 },
+                { n: 29, q: "Symptoms of ancylostomiasis include:", o: ["Intestinal bleeding", "Itching", "Malnutrition", "A+B", "A+B+C"], a: 4 },
+                { n: 30, q: "Diagnosis of ancylostomiasis include:", o: ["Biopsie of lung", "Blood culture", "Stool culture", "Microscopic examination of stool.", "A+B+C+D"], a: 3 },
+                { n: 31, q: "Differential diagnosis of ancylostomiasis include:", o: ["Amibiasis", "Giardiasis", "Strongyloidiasis", "A+B", "B+C"], a: 4 },
+                { n: 32, q: "Treatment of ancylostomiasis include:", o: ["Pyrantel pamoate", "Albendazole", "Mebendazole", "Levamisole", "A+B+C+D"], a: 4 },
+                { n: 33, q: "Complications of ancylostomiasis include:", o: ["Intestines, metabolism syndromes", "Rare complications", "Cardiovascular system and respiratory tract.", "A+B", "A+B+C"], a: 4 },
+                { n: 34, q: "Prognosis of ancylostomiasis include:", o: ["With lack of treatment, the prognosis is excellent.", "Severe anemia retards childhood development and intellectual performance.", "No need to treat", "All patients are dark", "A+B+C+D"], a: 1 },
+                { n: 35, q: "Prevention of ancylostomiasis include:", o: ["Washing hands after handling or eating food", "Wearing covered footwear in areas where the disease is endemic.", "Washing hands after going to the toilet", "A+B", "B+C"], a: 4 }
+            ]},
+            { id: 3, title: "3)- Strongyloïdiasis", questions: [
+                { n: 36, q: "Strongyloidiasis is a human parasitic disease caused by the:", o: ["Nematode (roundworm)", "Cestode", "Arthropode", "Protozoaire", "Others"], a: 0 },
+                { n: 37, q: "Geographic distribution of Strongyloidiasis:", o: ["Tropical regions of Africa, Asia and South America", "Occidental regions of Africa, Asia and South America", "Developed country", "In the world", "In Africa only"], a: 0 },
+                { n: 38, q: "Morphology the trophozoite of Strongyloidiasis include:", o: ["Biggest parasites to infect humans", "Rhabditiform larvae are shorter and slower", "Buccal cavity is multiple", "Males are thought to be parasitic", "Others"], a: 1 },
+                { n: 39, q: "Morphology the Eggs of Strongyloidiasis include:", o: ["The egg measures 60-80μm × 40-60μm", "They are thick-shelled and spherical", "They contain larva ready to hatch", "A+B", "A+B+C"], a: 2 },
+                { n: 40, q: "Host of Strongyloidiasis include:", o: ["Humans", "Dogs", "Cats", "A+B", "A+B+C"], a: 4 },
+                { n: 41, q: "Invasive stage of Strongyloidiasis includes:", o: ["Tissue destruction", "Skin penetration", "During cycle", "A+B", "A+B+C"], a: 1 },
+                { n: 42, q: "Risk factors of Strongyloidiasis include :", o: ["Live in or travel to city areas", "Immuno competent", "Travel to or live in South America, Africa, or other tropical regions", "Practice good personal hygiene", "Others"], a: 2 },
+                { n: 43, q: "Transmission of Strongyloidiasis include:", o: ["Sexual contact", "Auto-infection.", "Feces", "Skin contact", "A+B+C+D"], a: 4 },
+                { n: 44, q: "Incubation period of Strongyloidiasis include:", o: ["4 - 10days", "10 - 20days", "1 – 5 weeks", "14 - 30days", "30 - 60days"], a: 3 },
+                { n: 45, q: "Symptoms of Strongyloidiasis include:", o: ["Lower abdominal pain", "Headache", "Diarrhea or alternating diarrhea and constipation", "Fever", "A+B+C+D"], a: 2 },
+                { n: 46, q: "Diagnosis of Strongyloidiasis base on microscopic examination of:", o: ["Cerebrospinal fluid", "Sputum", "Stool", "A+B", "A+B+C"], a: 4 },
+                { n: 47, q: "Find 1 of all is not differential diagnosis of Strongyloidiasis include:", o: ["Cholera", "Acute Respiratory Distress Syndrome", "Septicemia", "Chronic Obstructive Pulmonary Disease", "Inflammatory Bowel Disease"], a: 2 },
+                { n: 48, q: "Treatment of Strongyloidiasis include", o: ["Thiabendazole", "Niclosamide", "Ivermectin", "A+B", "A+C"], a: 4 },
+                { n: 49, q: "Find 1 of all is not complications and sequelae of Strongyloidiasis include:", o: ["Malabsorption syndrome", "Visceral larva migrans", "Pneumonia", "Bronchospasm", "Gastrointestinal bleeding"], a: 2 },
+                { n: 50, q: "Prevention of Strongyloidiasis includes:", o: ["Use of footwear in endemic areas", "Treat all not infected dogs, cats, and monkeys", "Washing hand after eating", "A+B", "A+B+C"], a: 0 }
+            ]},
+            { id: 4, title: "4)- Trichocephaliasis", questions: [
+                { n: 51, q: "Trichocephaliasis is a parasitic disease caused by infection of the:", o: ["Trichinella", "Trichuris trichiura", "Schistosoma", "Giardia lamblia", "Clonorchis sinensis"], a: 1 },
+                { n: 52, q: "Morphology of adults male and female Trichocephaliasis include:", o: ["Females: 3 to 5 mm long", "Females: 30 to 50 mm long", "Males: 30 to 45 mm long", "A+C", "B+C"], a: 4 },
+                { n: 53, q: "Causes of Trichocephaliasis include:", o: ["Ingestion of soil containing the eggs of the roundworm.", "Ingestion of vegetables may also contain larvae", "Ingestion of water containing the larvae", "Direct contact", "Others"], a: 0 },
+                { n: 54, q: "Symptoms of Trichocephaliasis include:", o: ["Fever", "Headache", "Anemia", "Vomiting", "Nausea"], a: 2 },
+                { n: 55, q: "Complications of Trichocephaliasis include:", o: ["Growth and developmental early in children.", "Peritonitis", "Appendicitis", "Rectal prolapsed", "Others"], a: 3 },
+                { n: 56, q: "Prevention of Trichocephaliasis include:", o: ["Washing of food", "Hand washing before food handling", "Improved facilities for disposal of faeces", "A+B", "A+B+C"], a: 4 }
+            ]},
+            { id: 5, title: "5)- Trichinellosis", questions: [
+                { n: 57, q: "Trichinellosis is a disease caused by the parasite:", o: ["Entamoeba Histolytica", "Ankylostoma", "Clonorchis sinensis", "Fasciolopsiasis", "Others"], a: 4 },
+                { n: 58, q: "Morphology of Trichinella spiralis male and female include:", o: ["Males of T. spiralis measure 4 to 6 mm long", "The females of T. spiralis are about 3 time the size of the males", "Males of T. spiralis measure 1.4 to 1.6 mm long", "A+B", "A+B+C"], a: 2 },
+                { n: 59, q: "Causes of Trichinellosis include:", o: ["Eaten meat containing the trichinellosis cysts", "Eaten meat containing the trichinellosis trophozoite", "Eat fruit and fresh vegetable", "A+B", "A+B+C"], a: 0 },
+                { n: 60, q: "Transmission of Trichinellosis includes:", o: ["Direct contact", "Consumption of raw or undercooked meat of uninfected animals", "Consumption of cooked meat of infected animals", "Consumption of unsafe water.", "Others"], a: 4 },
+                { n: 61, q: "Incubation period of Trichinellosis include:", o: ["1 - 2 days", "2 - 4 days", "5 - 10 days", "6 - 12 days", "8 - 15 days"], a: 4 },
+                { n: 62, q: "Symptoms of Trichinellosis for first stage include:", o: ["Headache", "Eyes swelling", "Itchy skin or rash", "Abdominal pain", "Chill"], a: 3 },
+                { n: 63, q: "Symptoms of Trichinellosis for Second stage include:", o: ["Headache", "Eyes swelling", "Itchy skin or rash", "A+B", "A+B+C"], a: 4 },
+                { n: 64, q: "Diagnosis of Trichinellosis includes:", o: ["Muscle biopsy", "Blood test", "Stool examination", "A+B", "A+B+C"], a: 4 },
+                { n: 65, q: "Differential diagnosis of Trichinellosis includes:", o: ["Food Poisoning", "Myopathies", "Visceral Larva Migrans", "Toxocariasis", "A+B+C+D"], a: 4 },
+                { n: 66, q: "Complications of Trichinellosis includes:", o: ["Myocarditis", "Encephalitis", "Meningitis", "Pneumonia", "A+B+C+D"], a: 4 },
+                { n: 67, q: "Prevention of Trichinellosis includes:", o: ["Improve food safety for consumers", "Good heating", "Good freezing of raw meat.", "A+B", "A+B+C"], a: 4 }
+            ]},
+            { id: 6, title: "6)- Schistosomiasis", questions: [
+                { n: 68, q: "Schistosomiasis is a parasitic disease caused by:", o: ["Cestode", "Trematode", "Protozoaire", "Arthropode", "All of above"], a: 1 },
+                { n: 69, q: "Epidemiology of Schistosomiasis include:", o: ["Globally, 2,000 deaths are attributed annually", "Affects almost 24 million people worldwide", "The infection is prevalent in tropical and sub-tropical areas,", "In communities with potable water and adequate sanitation.", "Others"], a: 2 },
+                { n: 70, q: "Morphology of adult Schistosomiasis include:", o: ["Males don’t have many small nodules", "Adult males are 10 to 15 mm long", "Adult males are 20 to 30 mm long", "Females are shorter than male", "Both sexes have 3 suckers"], a: 1 },
+                { n: 71, q: "Morphology of Eggs Schistosomiasis include:", o: ["The shells of the eggs are dark", "110-170 µm long by 40 to 70 mm wide", "The shells of the eggs contain miracidia", "A+B", "B+C"], a: 4 },
+                { n: 72, q: "Risk factors of Schistosomiasis include:", o: ["Live in areas where schistosomiasis occurs.", "Travel to areas where no transmission.", "Skin in contact with freshwater from canals", "A+C", "A+B+C"], a: 3 },
+                { n: 73, q: "Transmission of schistosomiasis parasites by:", o: ["Penetrate the skin of persons who are wading, swimming etc", "Drinking unsafe water", "Eating fresh fruit", "Direct contact with the patients", "A+B+C+D"], a: 0 },
+                { n: 74, q: "Incubation period of schistosomiasis include usually:", o: ["4-10 days", "4-21 days", "14-24 days", "14-84 days", "14-100 days"], a: 3 },
+                { n: 75, q: "Early symptoms of schistosomiasis include:", o: ["General sense of feeling well", "Nausea, Vomiting", "Abdominal pain", "Headache", "A+B+C+D"], a: 2 },
+                { n: 76, q: "Find 1 of all is not late symptoms or chronic schistosomiasis:", o: ["Blood in your urine", "Cystitis", "Headaches", "Dizziness", "Fever 38C"], a: 4 },
+                { n: 77, q: "Diagnosis of schistosomiasis include:", o: ["Blood test", "Present eggs in stool or urine sample", "Symptoms of schistosomiasis", "A+B", "A+B+C"], a: 4 },
+                { n: 78, q: "Differential diagnosis of schistosomiasis includes:", o: ["Peptic ulcer disease", "Pancreatitis", "Pneumonia", "A+B", "A+B+C"], a: 3 },
+                { n: 79, q: "Complications of schistosomiasis includes:", o: ["Carcinoma of bladder", "Chronic kidney disease", "Gastrointestinal obstruction", "Hydro nephrosis", "A+B+C+D"], a: 4 },
+                { n: 80, q: "Prognosis of schistosomiasis includes:", o: ["Early disease usually not improves", "Mortality rate of up to 25%", "Can lead to renal failure", "B+C", "A+B+C"], a: 3 },
+                { n: 81, q: "Prevention of schistosomiasis includes:", o: ["Boil or filter water", "Avoid paddling, swimming", "Take waterproof trousers", "A+B", "A+B+C"], a: 4 }
+            ]},
+            { id: 7, title: "7)- Clonorchiasis senensis", questions: [
+                { n: 82, q: "Geographic distribution of clonorchiasis senensis include:", o: ["Vietnam", "Japan", "Cambodia", "A+B", "A+B+C"], a: 3 },
+                { n: 83, q: "Morphology of adult worm include:", o: ["Elongated worm", "Size 10-15 X3-5mm", "4 suckers", "A+B", "A+B+C"], a: 3 },
+                { n: 84, q: "Morphology of eggs worm include:", o: ["Cylindrical", "Big", "Peculated at 2 ends", "Yellowish color.", "Big knob at opposite end"], a: 3 },
+                { n: 85, q: "Definitive hosts of clonorchiasis senensis include:", o: ["Camels", "Humans", "Rats", "Cats", "A+B+C+D"], a: 4 },
+                { n: 86, q: "Intermediate hosts include:", o: ["Fish", "Snails", "Rats", "A+B", "A+B+C"], a: 3 },
+                { n: 87, q: "Causes of clonorchiasis senensis include:", o: ["Eating freshwater fish containing the fluke cyst", "Eating freshwater fish containing the fluke larvae", "Eating vegetable and fruit non clean.", "A+B", "A+B+C"], a: 3 },
+                { n: 88, q: "Risk factors include:", o: ["Living far freshwater water bodies", "People who eat freshwater fish that is good cooked", "People who eat freshwater fish that is raw.", "A+B", "A+B+C"], a: 2 },
+                { n: 89, q: "Route of transmission include:", o: ["Eating raw fresh water fish", "Eating inadequately cooked fresh shrimp", "Eating adequately cooked fresh shrimp", "A+B", "A+C"], a: 3 },
+                { n: 90, q: "Incubation period include:", o: ["1-2 weeks", "1-2 months.", "2-4 months", "1-2 days", "1-2 years"], a: 1 },
+                { n: 91, q: "Acute symptoms include:", o: ["High fever", "Slight jaundice", "Hepathomegaly", "A+B", "A+B+C"], a: 4 },
+                { n: 92, q: "Diagnosis base on include:", o: ["Gastro intestinal symptoms", "Discovery of eggs in feces", "History of eating raw fish", "A+B", "A+B+C"], a: 4 },
+                { n: 93, q: "Differential diagnosis include:", o: ["Bacterial hepatitis", "Amebiasis", "Lung cancer", "Fasciolopsiasis.", "Bronchitis"], a: 3 },
+                { n: 94, q: "Treatment include:", o: ["Metronidazol", "Praziquantel.", "Tetracycline", "Levamisole", "A+B+C+D"], a: 1 },
+                { n: 95, q: "Complication include:", o: ["Cholestatis cirrhosis", "Pancreatitis", "Lung abscess", "A+B", "A+B+C"], a: 3 },
+                { n: 96, q: "Prognosis include:", o: ["The Prognosis is not good.", "Late diagnosis may prevent long-term complications", "A proper and timely treatment can lead to a good prognosis.", "A+B", "B+C"], a: 2 },
+                { n: 97, q: "Prevention include:", o: ["Sanitary disposal of the excreta.", "Vaccination", "Immunization", "A+B", "A+B+C"], a: 0 }
+            ]},
+            { id: 8, title: "8)- fasciola hepatica", questions: [
+                { n: 98, q: "Causes of fasciola hepatica by Eating include:", o: ["fluke-infested", "Fresh-water raw", "Undercooked fish", "A+B", "A+B+C"], a: 4 },
+                { n: 99, q: "Morphology adult fluke includes:", o: ["Flat leaf like body.", "30-50mm long", "6-10mm long", "10-20mm large", "20-30mm large"], a: 0 },
+                { n: 100, q: "Morphology eggs includes:", o: ["Peculated and unembryonated contains a big unsegmented ovum.", "Red color", "Spherical", "Eggs can further develop only in soil.", "A+B+C+D"], a: 0 },
+                { n: 101, q: "Definitive host includes:", o: ["Snail", "Sheep", "Cattle", "A+B", "B+C"], a: 4 },
+                { n: 102, q: "Intermediate host include:", o: ["Sheep", "Snail", "Cattle", "Birth", "Others"], a: 1 },
+                { n: 103, q: "The life cycle of fasciola hepatica start when:", o: ["A female lays eggs in the liver", "Immature eggs are discharged in biliary ducts", "Eggs non embryonated develop larvae called miracidia", "A+B", "A+B+C"], a: 3 },
+                { n: 104, q: "Progress of infection include:", o: ["Ex-cyst in duodenum", "Ingestion metacercariae", "Enters peritoneal cavity", "A+B", "A+B+C"], a: 4 },
+                { n: 105, q: "Transmission by:", o: ["Ingestion of metacercariae encysted on aquatic vegetation.", "Contact of metacercariae on aquatic vegetation.", "Animal mature used as primary fertilizer", "A+B", "A+C"], a: 4 },
+                { n: 106, q: "Risk factors include:", o: ["Eating undercooked sheep or goat livers.", "Ingesting non contaminated water", "Drinking non contaminated water", "A+B", "A+B+C"], a: 0 },
+                { n: 107, q: "Symptoms include:", o: ["Hepatic tenderness", "Nausea", "Prolonged high fever", "A+B", "A+B+C"], a: 4 },
+                { n: 108, q: "Diagnosis base on:", o: ["Stool examination", "LCR examination", "Blood examination", "Blood culture", "Others"], a: 0 },
+                { n: 109, q: "Treatment include:", o: ["Bithional", "Triclabendazole", "Surgery", "A+B", "A+B+C"], a: 4 },
+                { n: 110, q: "Prevention include:", o: ["Health education", "Moluskicide", "Use medecine for prevention", "A+B", "A+B+C"], a: 3 }
+            ]},
+            { id: 9, title: "9)- Fasciolopsis buski", questions: [
+                { n: 111, q: "Fasciolopsis buski is classify the group of:", o: ["Cestodes", "Nematodes", "Trematodes", "Protozoose", "Others"], a: 2 },
+                { n: 112, q: "Geographic distribution found in:", o: ["Worldwide", "Developed countries", "Rural southeast Asia", "Europe", "Northeast Asia"], a: 2 },
+                { n: 113, q: "Epidemiology include:", o: ["10 million worldwide", "10 million worldwide", "High incidence male/child 2-5 years", "High incidence females/children 10–14 years.", "Males are higher"], a: 3 },
+                { n: 114, q: "Morphology adult worms include:", o: ["Smallest fluke to infect humans", "Non hermaphrodite", "About 10–15 mm long", "Non undulating", "Leaf-shaped"], a: 4 },
+                { n: 115, q: "Morphology eggs include:", o: ["Small", "Thick-shelled", "Thin-shelled", "13–16 micrometers long", "7–9 µm wide."], a: 2 },
+                { n: 116, q: "Host includes:", o: ["Pigs", "Humans", "Dogs", "Snail", "A+B+C+D"], a: 4 },
+                { n: 117, q: "Causes include:", o: ["Direct transmission", "Eat raw aquatic plants", "Undercooked aquatic plants", "A+B", "B+C"], a: 4 },
+                { n: 118, q: "Risk factors include:", o: ["Eating raw aquatic plants", "School-age children", "Lack of sanitation", "A+B", "A+B+C"], a: 4 },
+                { n: 119, q: "Incubation period include:", o: ["1-2 days", "1-2 weeks", "2 -4 weeks", "2 -4 months", "Others"], a: 4 },
+                { n: 120, q: "Symptoms for heavy infections:", o: ["Obstruction of the bowel", "Anemia", "Swelling of the skin", "A+B", "A+B+C"], a: 4 },
+                { n: 121, q: "Diagnosis can include:", o: ["Microscopic examination of stool", "Travel history", "Symptoms", "A+B", "A+B+C"], a: 4 },
+                { n: 122, q: "Differential diagnosis include:", o: ["Chronic gastritis.", "Colite", "Lung cancer", "Appendicitis", "Hepatitis"], a: 0 },
+                { n: 123, q: "Complications include:", o: ["Intestinal perforation", "Intestinal obstruction", "Stomach perforation", "Cancer of stomach", "A+B"], a: 4 },
+                { n: 124, q: "Prevention include:", o: ["Drinking water filtered or boiled", "Pig feces fertilizer", "Human feces fertilizer", "Freezing vegetables", "A+B+C+D"], a: 0 }
+            ]},
+            { id: 10, title: "10)- Diphyllobothrium latum", questions: [
+                { n: 125, q: "Adult segments composed of:", o: ["Scolex", "Neck", "Lower body", "A+B", "A+B+C"], a: 4 },
+                { n: 126, q: "Diphyllobothrium latum is the:", o: ["Smallest", "Biggest", "Longest", "Medium", "Others"], a: 2 },
+                { n: 127, q: "Transmission is:", o: ["Contact person to person", "Drinking unsafe water", "Eating raw or undercooking freshwater fish.", "A+B", "A+B+C"], a: 2 },
+                { n: 128, q: "Complication: Untreated, may cause:", o: ["Intestinal blockage", "Megaloblastic anemia", "Peritonitis", "A+B", "A+B+C"], a: 3 }
+            ]},
+            { id: 11, title: "11-12)- Taeniasis", questions: [
+                { n: 129, q: "Taeniasis saginata species:", o: ["Beef tapeworm", "Pork tapeworm", "Rodent", "Dog", "Others"], a: 0 },
+                { n: 130, q: "Taeniasis Solium species:", o: ["Beef", "Pork", "Dog", "Rodent", "Others"], a: 1 },
+                { n: 131, q: "Geographic saginata include:", o: ["Worldwide", "Latin America", "Africa", "A+B", "A+B+C"], a: 4 },
+                { n: 132, q: "Geographic Solium include:", o: ["Latin America", "Asia", "Africa", "Central and South America", "A+B+C"], a: 3 },
+                { n: 133, q: "Morphology saginata include:", o: ["Scolex is globular", "Scolex is quadrate", "700 to 1000 proglottids", "100k eggs per proglottid", "Thin/transparent"], a: 0 },
+                { n: 134, q: "Morphology solium include:", o: ["Scolex is quadrate", "100k eggs per proglottid", "Thin and transparent", "A+B", "A+B+C"], a: 4 },
+                { n: 135, q: "Hote of saginata include:", o: ["Humans", "Monkeys", "Buffalo", "A+B", "A+B+C"], a: 4 },
+                { n: 136, q: "Hote of solium include:", o: ["Giraffes", "Monkeys", "Buffalo", "Rats", "Dogs, cats rarely"], a: 4 },
+                { n: 137, q: "Causes saginata include:", o: ["Eating raw beef.", "Eating raw pork.", "Contact with stool", "A+C", "B+C"], a: 3 },
+                { n: 138, q: "Causes solium include:", o: ["Eating beef.", "Eating raw pork.", "Contact with stool", "A+C", "B+C"], a: 4 },
+                { n: 139, q: "Transmission saginata:", o: ["Eating beef with cysticerci", "Eating pork with cysticerci", "Indirect contact", "A+C", "B+C"], a: 0 },
+                { n: 140, q: "Transmission solium:", o: ["Eating beef", "Eating pork with cysticerci.", "Indirect", "A+C", "B+C"], a: 1 },
+                { n: 141, q: "Incubation period saginata:", o: ["2-3 days", "2-3 weeks", "4-5 weeks", "2 to 3 months", "4-6 months"], a: 3 },
+                { n: 142, q: "Symptoms solium include:", o: ["Abdominal pain", "Constipation", "Loss of appetite", "A+B", "A+B+C"], a: 4 },
+                { n: 143, q: "Medical treatment solium:", o: ["Mebendazol", "Metronidazol", "Niclosamide", "Rifampicine", "A+B+C+D"], a: 2 },
+                { n: 144, q: "Complications saginata:", o: ["Intestinal obstruction", "Cholecystitis", "Meningitis", "Pneumonia", "Cystitis"], a: 0 },
+                { n: 145, q: "Prevention saginata:", o: ["Good hygiene", "Cooking well", "Freezing meat", "B+C", "A+B+C"], a: 3 }
+            ]},
+            { id: 13, title: "13)- Hymenolepis nana", questions: [
+                { n: 146, q: "Hymenolepis nana or dwarf tapeworm is:", o: ["Big", "Small", "Found in great numbers", "A+B", "B+C"], a: 4 },
+                { n: 147, q: "Distribution include:", o: ["Hot countries", "Worldwide", "Adequate sanitation", "A+B", "A+B+C"], a: 3 },
+                { n: 148, q: "Infection common in:", o: ["Adults", "Children 4-10", "Children 2-4", "Children 8-12", "Immuno competent"], a: 1 },
+                { n: 149, q: "Adult worm is:", o: ["100-200 proglottids", "10-45mm long", "0.5- 1mm wide", "B+C", "A+B+C"], a: 4 },
+                { n: 150, q: "Definitive host includes:", o: ["Humans", "Beetles", "Fleas", "A+B", "A+B+C"], a: 0 },
+                { n: 151, q: "Intermediate host include:", o: ["Rodent", "Humans", "Beetles", "A+B", "A+B+C"], a: 2 },
+                { n: 152, q: "Causes include:", o: ["Animal eating", "Humans eating", "Material non contaminated", "A+B", "A+B+C"], a: 1 },
+                { n: 153, q: "Risk factors include:", o: ["Environments contaminated", "Untreated water", "Proper sanitation", "A+B", "A+B+C"], a: 3 },
+                { n: 154, q: "Dwarf tapeworm is a:", o: ["Big animal", "Small animal", "Big humans", "Small tapeworm in humans", "Medium"], a: 3 },
+                { n: 155, q: "Epidemiology include:", o: ["Rate 0.1-58%", "50-75 million carriers", "Children 4-10", "A+B", "A+B+C"], a: 4 },
+                { n: 156, q: "Morphology include:", o: ["5-10mm", "Neck short", "10-20 proglottids", "0.5- 1mm wide", "Others"], a: 3 },
+                { n: 157, q: "Definitive host:", o: ["Beetles/Fleas", "Rodent", "Humans", "A+B", "B+C"], a: 2 },
+                { n: 158, q: "Intermediate host:", o: ["Fleas", "Beetles", "Rodent", "A+B", "A+B+C"], a: 3 },
+                { n: 159, q: "Life cycle include:", o: ["Ingestion of eggs", "Oncospheres penetrate villus", "Mature several weeks", "Intermediate hosts accidental", "A+B+C+D"], a: 4 },
+                { n: 160, q: "Risk factor (False answer):", o: ["Contaminated feces", "Absence sanitation", "Adequate treatment", "Untreated water", "Others"], a: 2 },
+                { n: 161, q: "Transmission include:", o: ["Food/feces", "Infected beetle", "Touching mouth", "A+B", "A+B+C"], a: 4 },
+                { n: 162, q: "Incubation include:", o: ["1-2w", "2-3w", "3-4w", "2 - 4weeks", "4-5w"], a: 3 },
+                { n: 163, q: "Find False answer:", o: ["Loss of weight", "Vomiting", "Head ach", "Pain", "Diarrhoea"], a: 2 },
+                { n: 164, q: "Diagnosis include:", o: ["CT", "Eggs in stool", "Culture", "Scott test", "Rx lung"], a: 1 },
+                { n: 165, q: "Differential include:", o: ["Colitis", "Ascariasis", "Appendicitis", "A+B", "A+B+C"], a: 3 },
+                { n: 166, q: "Treatment include:", o: ["Praziquantel", "Niclosamide", "Albendazole", "A+B", "A+B+C"], a: 4 },
+                { n: 167, q: "Prevention include:", o: ["Destruction of rats", "Good hygiene", "Treating infected", "Insects", "A+B+C"], a: 4 }
+            ]},
+            { id: 14, title: "14)- Echinococcus granulosus", questions: [
+                { n: 168, q: "Class of Hydatid worm:", o: ["Cestode.", "Nematode", "Bacteria", "Virus", "Others"], a: 0 },
+                { n: 169, q: "Definitive hosts:", o: ["Sheep", "Deer", "Goats", "Horses", "Dogs."], a: 4 },
+                { n: 170, q: "Intermediate hosts:", o: ["Wolves", "Cats", "Goats.", "A+B", "A+B+C"], a: 2 },
+                { n: 171, q: "Differential diagnosis:", o: ["Brain obstruction", "Cholangitis", "Biliary obstruction", "A+B", "A+B+C."], a: 4 }
+            ]},
+            { id: 15, title: "15)- Giardiasis", questions: [
+                { n: 172, q: "Disease caused by:", o: ["Cestodes", "Protozoan", "Trematodes", "Nematodes", "Others"], a: 1 },
+                { n: 173, q: "NOT high-risk group:", o: ["Infants", "International adoptees", "Children", "Travelers", "Immuno competent"], a: 4 },
+                { n: 174, q: "Reservoirs definitive host:", o: ["Bears", "Humans", "Primates", "Cattle", "A+B+C+D"], a: 4 },
+                { n: 175, q: "People in 2013 world:", o: ["80m", "180m", "280 million", "380m", "480m"], a: 2 },
+                { n: 176, q: "Infective stage:", o: ["Trophozoites", "Giardia cysts", "Young", "Adult", "Others"], a: 1 },
+                { n: 177, q: "Causes include:", o: ["Safe food", "Non contaminated water", "Person-to-person contact", "Homosexual", "A+B+C+D"], a: 2 },
+                { n: 178, q: "High risk factors include:", o: ["Travelers to non endemic", "Live with not sick", "Immuno competent", "Homosexual men."], a: 3 },
+                { n: 179, q: "NOT true transmission:", o: ["Swimming", "Faeco-oral", "Animals", "Blood transfusion", "Objects"], a: 3 },
+                { n: 180, q: "Incubation period:", o: ["1-2 hours", "1-2 days", "1-2 months", "1-2 years", "Others"], a: 4 },
+                { n: 181, q: "Symptoms include:", o: ["Weight loss", "Bloating", "Appetite loss", "A+B", "A+B+C"], a: 4 },
+                { n: 182, q: "Diagnosis include:", o: ["Blood", "Fecal", "Duodenal fluid", "Bile", "B+C+D"], a: 4 },
+                { n: 183, q: "Treatment include:", o: ["Albendazole", "Metronidazole", "Furazolidone", "B+C", "A+B+C"], a: 3 },
+                { n: 184, q: "Differential include:", o: ["Amibiasis", "Cryptosporidiosis", "Bacterial", "Trchomoniasis", "Nana"], a: 1 },
+                { n: 185, q: "Species include:", o: ["2", "3", "4", "5", "Others"], a: 4 },
+                { n: 186, q: "Complications:", o: ["Dehydration.", "Anemia", "Appendicitis", "Bronchitis", "Encephalitis"], a: 0 },
+                { n: 187, q: "Prognosis includes:", o: ["Death", "Usually good", "Re-infection", "B+C", "A+B+C"], a: 3 },
+                { n: 188, q: "NOT true prevention:", o: ["Safe water", "Travelers uncooked", "Breast-feeding NOT protective", "Hygiene", "Sex"], a: 2 }
+            ]},
+            { id: 16, title: "16)- Trichomoniasis vaginalis", questions: [
+                { n: 189, q: "STI per year around:", o: ["248 million new cases", "248 million new/old", "200m", "100m", "50m"], a: 0 },
+                { n: 190, q: "Hote include:", o: ["Men", "Women", "Animal", "A+B", "A+B+C"], a: 3 },
+                { n: 191, q: "Resides in:", o: ["Upper genital", "Lower genital", "Male urethra", "Male prostate", "B+C+D"], a: 4 },
+                { n: 192, q: "Transmitted by:", o: ["Indirect", "Airborn", "Sexual intercourse", "Water", "A+B+C+D"], a: 2 },
+                { n: 193, q: "Risk factors include:", o: ["Multiple partners", "No condom", "Prior infection", "Other STIs", "A+B+C+D"], a: 4 },
+                { n: 194, q: "Incubation include:", o: ["3 to 28 days", "7 days average", "2+ years", "A+B", "A+B+C"], a: 4 },
+                { n: 195, q: "Symptoms in women:", o: ["Ejaculation burn", "Penile discharge", "Tingling", "Discomfort during intercourse", "Others"], a: 3 },
+                { n: 196, q: "Symptoms in man:", o: ["Blood", "Burning sensation after ejaculation", "Abdominal pain", "Itching", "Intercourse discomfort"], a: 1 },
+                { n: 197, q: "Treatment include:", o: ["Partners same time", "Local", "Fasigyne", "Metronidazol", "A+B+C+D"], a: 4 },
+                { n: 198, q: "Complications include:", o: ["Pneumonia", "Acute respiratory", "Meningitis", "Appendicitis", "Low birth weight"], a: 4 },
+                { n: 199, q: "Prognosis include:", o: ["90% cure if partner treated", "Excellent", "Likely reinfection if partner NOT treated", "A+B", "B+C"], a: 3 },
+                { n: 200, q: "Prevention include:", o: ["Treatment partners", "Condoms", "Sharing sex toys", "A+B", "A+B+C"], a: 4 }
+            ]},
+            { id: 17, title: "17)- Amebiasis", questions: [
+                { n: 201, q: "Disease caused by parasite:", o: ["Balantidium coli", "Entamoeba Histolytica.", "Fasciolopsis", "Trichuris", "Others"], a: 1 },
+                { n: 202, q: "Incidence higher in:", o: ["Africa", "Occidental", "Developped", "Developing countries.", "Others"], a: 3 },
+                { n: 203, q: "Risk groups industrialized:", o: ["Travelers", "Male homosexuals", "Institutionalized", "A+B", "A+B+C"], a: 4 },
+                { n: 204, q: "Prevalence varies with:", o: ["Level of sanitation", "Higher in tropics", "Lower in tropics", "A+B.", "B+C"], a: 3 },
+                { n: 205, q: "Leading cause mortality human:", o: ["First", "Second.", "Third", "Fourth", "Others"], a: 1 },
+                { n: 206, q: "Different form E. his include:", o: ["Precyst", "Cyst", "Trophozoite", "A+B", "A+B+C"], a: 4 },
+                { n: 207, q: "Trophozoite form include:", o: ["Oval-shaped", "Spherical", "Thin cell membrane", "Single nucleus", "A+B+C+D."], a: 4 },
+                { n: 208, q: "Characteristics the cysts:", o: ["Mature passed in feces", "Cysts outside host", "Chitin stomach acid", "A+B", "A+B+C"], a: 4 },
+                { n: 209, q: "Hote parasite include:", o: ["Humans.", "Soil", "Water", "A+B", "A+B+C"], a: 0 },
+                { n: 210, q: "Lifecycle include:", o: ["Complex", "Very simple.", "Mixed", "Depend on immunity", "All above"], a: 1 },
+                { n: 211, q: "Risk factors include:", o: ["Developing countries", "Anyone", "Poor sanitary", "Homosexual", "A+B+C+D."], a: 4 },
+                { n: 212, q: "Transmission include:", o: ["Contaminated food", "Veneral homosexual", "Direct person to person", "Night soil fertilizer", "A+B+C+D."], a: 4 },
+                { n: 213, q: "Mild symptoms include:", o: ["Abdominal tenderness", "Diarrhea or dysentery.", "Vomiting", "10 to 20 stools", "Fever"], a: 1 },
+                { n: 214, q: "Severe symptoms include:", o: ["Dysentery", "Bloody stools 10 to 20 per day.", "Weight loss", "Cramping", "Fatigue"], a: 1 },
+                { n: 215, q: "Diagnosis based on:", o: ["Stool", "Antigen ELISA", "Antibody hemagglutination", "A+B", "A+B+C."], a: 4 },
+                { n: 216, q: "Differential diagnosis:", o: ["Pneumonia", "Abdominal Abscess", "Abdominal perforation", "A+B", "A+B+C."], a: 4 },
+                { n: 217, q: "Treatment intestinal with:", o: ["Emetine", "Metronidazole", "Chloroquine", "A+B", "A+B+C."], a: 4 },
+                { n: 218, q: "Treatment extra intestinal:", o: ["Metronidazole", "Dehydroemetine", "Cephalosporine", "A+B.", "A+B+C"], a: 3 },
+                { n: 219, q: "Complications include:", o: ["Appendicitis", "Liver abscess.", "Meningitis", "Encephalitis", "A+B+C+D"], a: 1 },
+                { n: 220, q: "Prognosis include:", o: ["Untreated frequently good", "Relapse possible", "Treatment improvement few days", "A+B", "B+C."], a: 4 },
+                { n: 221, q: "Prevention include:", o: ["Purified water.", "Unpeeled fruit", "Uncooked vegetables", "Unpurified water", "A+B+C"], a: 0 }
+            ]},
+            { id: 18, title: "18)- Balantidiasis", questions: [
+                { n: 222, q: "Disease caused by parasite:", o: ["Schistosoma", "Fasciolopsis", "Balantidium coli.", "Onchocerca", "Echinococcus"], a: 2 },
+                { n: 223, q: "Trophozoite formes include:", o: ["50-130 µm long", "Covered in cilia", "Micro/macro nuclei", "A+B", "A+B+C."], a: 4 },
+                { n: 224, q: "Cyst forms include:", o: ["Reproductive", "Not infective", "4-6 µm across", "Only macronucleus.", "A+B+C+D"], a: 3 },
+                { n: 225, q: "Host parasite include:", o: ["Human", "Dogs", "Pigs", "Monkeys", "A+B+C+D."], a: 4 },
+                { n: 226, q: "Life cycle include:", o: ["Pig accidental host", "Ingestion route", "Sexual reproduction only", "A+B.", "A+B+C"], a: 3 },
+                { n: 227, q: "Causes include:", o: ["Infection balantidiasis", "Passed directly pig feces", "Indirectly water", "A+B", "A+B+C."], a: 4 },
+                { n: 228, q: "Risk factors include:", o: ["Pig fertilizer", "Poor nutrition/alcoholism", "Water not contaminated", "A+B.", "A+B+C"], a: 3 },
+                { n: 229, q: "Incubation period include:", o: ["Depends on dose and health.", "Not depends on dose", "10-15 days", "5-7 days", "A+C"], a: 0 },
+                { n: 230, q: "Sign and symptoms include:", o: ["Diarrhea", "Colitis", "Ulceration gut", "Dysentery", "A+B+C+D."], a: 4 },
+                { n: 231, q: "Diagnosis include:", o: ["Biopsy", "Patient stool", "Sigmoid scope", "A+B", "A+B+C."], a: 4 },
+                { n: 232, q: "Drugs commonly used:", o: ["Rifampicine", "Mebendazol", "Tetracycline.", "Albendazol", "Chloramphenicol"], a: 2 },
+                { n: 233, q: "Complications include:", o: ["Meningitis", "Intestinal perforation.", "Encephalitis", "Urinary", "Pneumonia"], a: 1 },
+                { n: 234, q: "Prognosis include:", o: ["Not dependent on health", "Severely occasionally die", "Good if treated with antibiotics", "A+B", "B+C."], a: 4 },
+                { n: 235, q: "Control and prevention include:", o: ["Walking boot non contaminated", "Covered footwear", "Sanitary human/pig feces.", "A+C", "B+C"], a: 2 }
+            ]}
+        ];
+
+        let audioCtx = null;
+        function playTone(freq, type, duration) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const playCorrect = () => playTone(880, 'sine', 0.2);
+        const playWrong = () => playTone(220, 'square', 0.2);
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            let qCount = 0;
+            quizData.forEach(section => {
+                let html = `
+                <div id="sec-${section.id}" class="space-y-8">
+                    <div class="flex justify-between items-center border-b-4 border-slate-200 pb-3">
+                        <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">${section.title}</h2>
+                        <button onclick="resetSection(${section.id})" class="redo-btn">⟲ Reset Section</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6">`;
+
+                section.questions.forEach((q, idx) => {
+                    qCount++;
+                    html += `
+                        <div class="bg-white p-6 border-l-8 border-slate-400 rounded-2xl shadow-md q-block" data-section="${section.id}" data-correct="${q.a}">
+                            <p class="font-bold text-lg mb-4 text-gray-800">Question ${q.n}: ${q.q}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 options-grid">
+                                ${q.o.map((opt, oIdx) => {
+                                    const letter = String.fromCharCode(65 + oIdx);
+                                    return `
+                                        <label class="flex items-center p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-all relative">
+                                            <input type="radio" name="sec${section.id}-q${idx}" value="${oIdx}" class="hidden" onchange="checkAnswer(this)">
+                                            <span class="font-bold text-slate-500 mr-2">${letter})-</span>
+                                            <span class="text-gray-700 font-medium">${opt}</span>
+                                        </label>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                });
+                html += `</div></div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function checkAnswer(input) {
+            const block = input.closest('.q-block');
+            const grid = block.querySelector('.options-grid');
+            const labels = grid.querySelectorAll('label');
+            const selected = parseInt(input.value);
+            const correct = parseInt(block.dataset.correct);
+
+            grid.classList.add('disabled-labels');
+
+            labels.forEach((label, i) => {
+                if (i === correct) label.classList.add('option-correct');
+                if (i === selected && selected !== correct) label.classList.add('option-incorrect');
+            });
+
+            if (selected === correct) playCorrect();
+            else playWrong();
+        }
+
+        function resetSection(sectionId) {
+            const blocks = document.querySelectorAll(`.q-block[data-section="${sectionId}"]`);
+            blocks.forEach(block => {
+                const grid = block.querySelector('.options-grid');
+                grid.classList.remove('disabled-labels');
+                const labels = grid.querySelectorAll('label');
+                labels.forEach(l => {
+                    l.classList.remove('option-correct', 'option-incorrect');
+                    l.querySelector('input').checked = false;
+                });
+            });
+        }
+
+        function calculateFinalScore() {
+            let score = 0;
+            document.querySelectorAll('.q-block').forEach(block => {
+                const checked = block.querySelector('input:checked');
+                if (checked && parseInt(checked.value) === parseInt(block.dataset.correct)) score++;
+            });
+            document.getElementById('total-score').textContent = score;
+            document.getElementById('final-result').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = renderQuiz;
+    </script>
+</body>
+</html>
